@@ -1,0 +1,61 @@
+// lib/supabase/server.ts
+import { createServerClient } from '@supabase/ssr'
+import { cookies } from 'next/headers'
+import type { Database } from '@/types/database'
+
+export async function createClient() {
+  const cookieStore = await cookies()
+  return createServerClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() { return cookieStore.getAll() },
+        setAll(cookiesToSet) {
+          try {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            )
+          } catch { /* middleware handles refresh */ }
+        },
+      },
+    }
+  )
+}
+
+export async function createServiceClient() {
+  const cookieStore = await cookies()
+  return createServerClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    {
+      cookies: {
+        getAll() { return cookieStore.getAll() },
+        setAll(cookiesToSet) {
+          try {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            )
+          } catch {}
+        },
+      },
+    }
+  )
+}
+
+/** Get the authed user or throw — use in Server Actions / Route Handlers */
+export async function getAuthUser() {
+  const supabase = await createClient()
+  const { data: { user }, error } = await supabase.auth.getUser()
+  if (error || !user) throw new Error('Not authenticated')
+  return user
+}
+
+/** Get full profile of the authed user */
+export async function getAuthProfile() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return null
+  const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single()
+  return data
+}

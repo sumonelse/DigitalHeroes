@@ -1,12 +1,11 @@
 'use server'
 import { revalidatePath } from 'next/cache'
-import { createClient, createServiceClient, getAuthUser } from '@/lib/supabase/server'
+import { createServiceClient, getAuthUser, isAdmin } from '@/lib/supabase/server'
 
 async function requireAdmin() {
   const user = await getAuthUser()
-  const supabase = await createClient()
-  const { data } = await supabase.from('profiles').select('is_admin').eq('id', user.id).single()
-  if (!data?.is_admin) throw new Error('Unauthorized')
+  const admin = await isAdmin(user.id)
+  if (!admin) throw new Error('Unauthorized')
   return user
 }
 

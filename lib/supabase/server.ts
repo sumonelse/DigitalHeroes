@@ -59,3 +59,23 @@ export async function getAuthProfile() {
   const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single()
   return data
 }
+
+/** Helper to get a single row with proper typing */
+export async function getProfile(userId: string) {
+  const supabase = await createClient()
+  const { data } = await supabase.from('profiles').select('*').eq('id', userId).single()
+  return data
+}
+
+/** Helper to check if user is admin */
+export async function isAdmin(userId: string): Promise<boolean> {
+  const supabase = await createClient()
+  const { data } = await supabase.from('profiles').select('is_admin').eq('id', userId).single()
+  return data?.is_admin ?? false
+}
+
+/** Get single row with auto-typing (avoids TypeScript inference issues) */
+export async function getOne<T>(builder: { single(): Promise<{ data: T | null }> }): Promise<T | null> {
+  const { data } = await builder.single()
+  return data
+}

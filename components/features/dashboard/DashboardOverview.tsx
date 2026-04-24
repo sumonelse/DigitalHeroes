@@ -42,7 +42,7 @@ export function DashboardOverview({ subscription, scores, currentDraw, myEntry, 
     : null
 
   const container = { hidden: {}, show: { transition: { staggerChildren: 0.07 } } }
-  const item = { hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { ease: [0.16, 1, 0.3, 1], duration: 0.5 } } }
+  const item: { hidden: { opacity: number; y: number }; show: { opacity: number; y: number; transition: { ease: [number, number, number, number]; duration: number } } } = { hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { ease: [0.16, 1, 0.3, 1] as any, duration: 0.5 } } }
 
   return (
     <div>

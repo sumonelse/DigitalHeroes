@@ -2,6 +2,9 @@
 import { revalidatePath } from 'next/cache'
 import { createClient, createServiceClient, getAuthUser } from '@/lib/supabase/server'
 import { z } from 'zod'
+import type { Database } from '@/types/database'
+
+type UserScore = Database['public']['Functions']['get_user_scores']['Returns'][0]
 
 export async function enterDraw(drawId: string) {
   try {
@@ -23,7 +26,7 @@ export async function enterDraw(drawId: string) {
       return { success: false, error: 'You need exactly 5 scores to enter the draw.' }
     }
 
-    const submittedScores = scores.map((s: any) => s.score)
+    const submittedScores = scores.map((s: UserScore) => s.score)
 
     // Enter draw
     const { error } = await supabase.from('draw_entries').upsert({
@@ -132,7 +135,12 @@ export async function adminPublishDraw(drawId: string, confirmedNumbers?: number
     .eq('period_year', new Date().getMonth() + 2 > 12 ? new Date().getFullYear() + 1 : new Date().getFullYear())
     .single()
 
-  if ((results as any)?.jackpot_rolled && next.data) {
+  type DrawResults = {
+  jackpot_rolled?: boolean
+  winners_by_match?: Record<string, unknown>
+}
+
+  if ((results as DrawResults)?.jackpot_rolled && next.data) {
     const { data: currentPool } = await serviceClient.from('prize_pools').select('jackpot_pool_gbp').eq('id', (await serviceClient.from('draws').select('prize_pool_id').eq('id', drawId).single()).data?.prize_pool_id ?? '').single()
     if (currentPool) {
       await serviceClient.from('prize_pools').update({

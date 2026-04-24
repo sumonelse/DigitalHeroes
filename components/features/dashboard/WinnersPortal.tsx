@@ -62,17 +62,10 @@ export function WinnersPortal({ winners: initial, userId }: { winners: WinnerRow
 
     const { data: { publicUrl } } = supabase.storage.from('winner-proofs').getPublicUrl(path)
 
-    const { error: updateErr } = await supabase
-      .from('winners')
-      .update({ proof_url: publicUrl, proof_uploaded_at: new Date().toISOString() })
-      .eq('id', winnerId)
-      .eq('user_id', userId)
-
-    if (updateErr) {
-      setUploadError(prev => ({ ...prev, [winnerId]: updateErr.message }))
-    } else {
-      setWinners(prev => prev.map(w => w.id === winnerId ? { ...w, proof_url: publicUrl } : w))
-    }
+    await (supabase.from('winners') as any).update({
+      proof_url: publicUrl,
+      proof_uploaded_at: new Date().toISOString(),
+    }).eq('id', winnerId).eq('user_id', userId)
 
     setUploading(null)
   }

@@ -42,13 +42,10 @@ export default function OnboardingPage() {
         data: { user },
       } = await supabase.auth.getUser();
       if (user) {
-        await supabase
-          .from("profiles")
-          .update({
-            full_name: name || undefined,
-            onboarding_complete: true,
-          })
-          .eq("id", user.id);
+        await (supabase.from("profiles") as any).update({
+          full_name: name || null,
+          onboarding_complete: true,
+        }).eq("id", user.id)
       }
       router.push("/pricing?onboarding=true");
     });

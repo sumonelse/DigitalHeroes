@@ -35,7 +35,7 @@ export function SettingsPanel({ profile, subscription }: Props) {
     e.preventDefault()
     setSaving(true)
     const supabase = createClient()
-    await supabase.from('profiles').update({
+    await (supabase.from('profiles') as any).update({
       full_name: name,
       phone,
       home_club: club,

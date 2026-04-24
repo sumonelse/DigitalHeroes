@@ -73,8 +73,8 @@ export async function getProfile(userId: string) {
 /** Helper to check if user is admin */
 export async function isAdmin(userId: string): Promise<boolean> {
   const supabase = await createClient()
-  const { data } = await supabase.from('profiles').select('is_admin').eq('id', userId).single<{ is_admin: boolean }>()
-  return data?.is_admin ?? false
+  const { data } = await supabase.from('profiles').select('is_admin').eq('id', userId).single()
+  return (data as { is_admin: boolean })?.is_admin ?? false
 }
 
 /** Update a row with proper typing */

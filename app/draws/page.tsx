@@ -14,7 +14,18 @@ async function getDraws() {
     .order('period_month', { ascending: false })
     .limit(12)
   
-  return data ?? []
+  return (data ?? []) as Array<{
+    id: string
+    period_month: number
+    period_year: number
+    status: string
+    winning_numbers: number[] | null
+    prize_pools: {
+      jackpot_pool_gbp: number
+      match4_pool_gbp: number
+      match3_pool_gbp: number
+    } | null
+  }>
 }
 
 const MONTHS = [

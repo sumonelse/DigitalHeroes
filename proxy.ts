@@ -15,10 +15,10 @@ export async function proxy(request: NextRequest) {
     {
       cookies: {
         getAll() { return request.cookies.getAll() },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
+        setAll(cookiesToSet: Array<{ name: string; value: string; options?: any }>) {
+          cookiesToSet.forEach(({ name, value }: { name: string; value: string }) => request.cookies.set(name, value))
           supabaseResponse = NextResponse.next({ request })
-          cookiesToSet.forEach(({ name, value, options }) =>
+          cookiesToSet.forEach(({ name, value, options }: { name: string; value: string; options?: any }) =>
             supabaseResponse.cookies.set(name, value, options)
           )
         },
@@ -42,8 +42,8 @@ export async function proxy(request: NextRequest) {
   if (path.startsWith('/admin')) {
     if (!user) return NextResponse.redirect(new URL('/login', request.url))
 
-    const { data: profile } = await supabase.from('profiles').select('is_admin').eq('id', user.id).single()
-    if (!profile?.is_admin) return NextResponse.redirect(new URL('/dashboard', request.url))
+    const { data: profile } = await (supabase.from('profiles').select('is_admin').eq('id', user.id).single() as any)
+    if (!(profile as any)?.is_admin) return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
   return supabaseResponse

@@ -12,7 +12,7 @@ const ScoreSchema = z.object({
 export type ScoreActionResult = {
   success: boolean
   error?: string
-  data?: { id: string; score: number; score_date: string }
+  data?: { id: string; score: number; score_date: string; created_at: string }
 }
 
 export async function addScore(formData: FormData): Promise<ScoreActionResult> {

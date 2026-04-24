@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { motion } from "motion/react";
-import type { PrizePool } from "@/types/database";
+import type { PrizePool } from "@/types";
 
 const WORDS = ["Lives", "Communities", "Futures", "Dreams", "Heroes"];
 

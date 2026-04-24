@@ -4,7 +4,7 @@ import { getDrawEligibility } from '@/app/actions/scores'
 import { DashboardOverview } from '@/components/features/dashboard/DashboardOverview'
 
 export const metadata = { title: 'Dashboard' }
-export const dynamic = 'force-dynamic'
+
 
 async function getDashboardData(userId: string) {
   const supabase = await createClient()

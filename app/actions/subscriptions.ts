@@ -27,8 +27,9 @@ export async function createCheckoutSession(
 
   const priceKey =
     plan === "monthly" ? "stripe_monthly_price" : "stripe_yearly_price";
-  const stripePriceId = settings?.find((s: { key: string }) => s.key === priceKey)
-    ?.value as string;
+  const stripePriceId = settings?.find(
+    (s: { key: string }) => s.key === priceKey,
+  )?.value as string;
 
   // Get or create Stripe customer
   const { data: sub } = await supabase

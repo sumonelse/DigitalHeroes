@@ -3,7 +3,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'motion/react'
-import type { Profile } from '@/types/database'
+import type { Profile } from '@/types'
 import { signOut } from '@/app/actions/auth'
 
 const NAV_MOBILE = [

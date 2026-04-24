@@ -1,7 +1,7 @@
 'use client'
 import { useState, useTransition } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
-import type { Charity } from '@/types/database'
+import type { Charity } from '@/types'
 import { updateCharitySettings } from '@/app/actions/subscriptions'
 
 interface Props {

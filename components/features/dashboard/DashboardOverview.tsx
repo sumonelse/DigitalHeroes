@@ -1,7 +1,7 @@
 'use client'
 import { motion } from 'motion/react'
 import Link from 'next/link'
-import type { Subscription, GolfScore, Draw, DrawEntry, Winner, PrizePool } from '@/types/database'
+import type { Subscription, GolfScore, Draw, DrawEntry, Winner, PrizePool } from '@/types'
 
 interface Props {
   subscription: (Subscription & { charities?: { name: string; short_description: string } | null }) | null

@@ -1,7 +1,7 @@
 'use client'
 import { useState, useTransition } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
-import type { Profile, Subscription } from '@/types/database'
+import type { Profile, Subscription } from '@/types'
 import { createCustomerPortalSession } from '@/app/actions/subscriptions'
 import { createClient } from '@/lib/supabase/client'
 

@@ -3,7 +3,10 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import type { Database } from '@/types/database'
 
-export async function createClient() {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type SupabaseClient = any
+
+export async function createClient(): Promise<SupabaseClient> {
   const cookieStore = await cookies()
   return createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -11,9 +14,9 @@ export async function createClient() {
     {
       cookies: {
         getAll() { return cookieStore.getAll() },
-        setAll(cookiesToSet) {
+        setAll(cookiesToSet: any[]) {
           try {
-            cookiesToSet.forEach(({ name, value, options }) =>
+            cookiesToSet.forEach(({ name, value, options }: any) =>
               cookieStore.set(name, value, options)
             )
           } catch { /* middleware handles refresh */ }
@@ -23,7 +26,7 @@ export async function createClient() {
   )
 }
 
-export async function createServiceClient() {
+export async function createServiceClient(): Promise<SupabaseClient> {
   const cookieStore = await cookies()
   return createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -31,9 +34,9 @@ export async function createServiceClient() {
     {
       cookies: {
         getAll() { return cookieStore.getAll() },
-        setAll(cookiesToSet) {
+        setAll(cookiesToSet: any[]) {
           try {
-            cookiesToSet.forEach(({ name, value, options }) =>
+            cookiesToSet.forEach(({ name, value, options }: any) =>
               cookieStore.set(name, value, options)
             )
           } catch {}
@@ -70,8 +73,20 @@ export async function getProfile(userId: string) {
 /** Helper to check if user is admin */
 export async function isAdmin(userId: string): Promise<boolean> {
   const supabase = await createClient()
-  const { data } = await supabase.from('profiles').select('is_admin').eq('id', userId).single()
+  const { data } = await supabase.from('profiles').select('is_admin').eq('id', userId).single<{ is_admin: boolean }>()
   return data?.is_admin ?? false
+}
+
+/** Update a row with proper typing */
+export async function updateRow<T extends keyof Database['public']['Tables']>(
+  tableName: T,
+  data: Database['public']['Tables'][T]['Update'],
+  filter: { eq: [string, unknown] }
+) {
+  const supabase = await createClient()
+  const { error } = await (supabase.from(tableName) as any).update(data).eq(...filter.eq)
+  if (error) throw error
+  return { success: true }
 }
 
 /** Get single row with auto-typing (avoids TypeScript inference issues) */

@@ -1,10 +1,22 @@
 'use client'
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
-import type { Draw, PrizePool } from '@/types/database'
+import type { Draw, PrizePool } from '@/types'
 import { adminRunDrawSimulation, adminPublishDraw, adminUpdateDrawLogic } from '@/app/actions/draws'
 
-interface DrawWithPool extends Draw { prize_pools: PrizePool | null }
+interface DrawWithPool {
+  id: string
+  period_month: number
+  period_year: number
+  status: string
+  winning_numbers: number[] | null
+  simulation_runs: number
+  total_entries: number
+  total_winners: number
+  logic_type: string
+  published_at: string | null
+  prize_pools: PrizePool | null
+}
 
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
 

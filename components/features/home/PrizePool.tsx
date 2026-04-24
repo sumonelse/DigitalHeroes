@@ -2,7 +2,7 @@
 import { useRef } from 'react'
 import { motion, useInView } from 'motion/react'
 import Link from 'next/link'
-import type { PrizePool as PrizePoolType, Charity } from '@/types/database'
+import type { PrizePool as PrizePoolType, Charity } from '@/types'
 
 /* ── Prize Pool ─────────────────────────────────────────────── */
 interface PrizePoolProps { pool: PrizePoolType | null }

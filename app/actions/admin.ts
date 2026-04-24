@@ -37,7 +37,7 @@ export async function adminUpdateUserScore(scoreId: string, newScore: number, ne
 
   const { error } = await supabase
     .from('golf_scores')
-    .update({ score: newScore, score_date: newDate })
+    .update({ score: newScore, score_date: newDate, updated_at: new Date().toISOString() })
     .eq('id', scoreId)
 
   if (error) return { error: error.message }

@@ -5,7 +5,7 @@ import { createClient, getAuthUser, createServiceClient } from '@/lib/supabase/s
 import { revalidatePath } from 'next/cache'
 import type { SubscriptionPlan } from '@/types/database'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2025-01-27.acacia' })
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2026-04-22.dahlia' })
 
 export async function createCheckoutSession(plan: SubscriptionPlan): Promise<never> {
   const user = await getAuthUser()

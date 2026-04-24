@@ -96,7 +96,7 @@ export function AdminWinnersManager({ winners: initialWinners }: { winners: Winn
         ].map(s => (
           <div key={s.label} className="glass rounded-2xl p-5">
             <div className={`font-display text-2xl font-bold ${s.color}`}>
-              £{s.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+              ₹{s.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
             </div>
             <div className="text-xs text-white/40 mt-1">{s.label}</div>
           </div>
@@ -163,7 +163,7 @@ export function AdminWinnersManager({ winners: initialWinners }: { winners: Winn
 
                 {/* Amount */}
                 <div className="font-display text-lg font-bold text-white flex-shrink-0">
-                  £{winner.prize_amount_gbp.toFixed(2)}
+                  ₹{winner.prize_amount_gbp.toFixed(2)}
                 </div>
 
                 {/* Status */}

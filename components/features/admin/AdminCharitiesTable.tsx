@@ -85,7 +85,7 @@ export function AdminCharitiesTable({ charities: initialCharities }: { charities
                     </span>
                   </td>
                   <td className="px-5 py-4 text-white/40">{charity.featured_order ?? '—'}</td>
-                  <td className="px-5 py-4 text-emerald font-medium">£{charity.total_raised_gbp.toLocaleString()}</td>
+                  <td className="px-5 py-4 text-emerald font-medium">₹{charity.total_raised_gbp.toLocaleString('en-IN')}</td>
                   <td className="px-5 py-4 text-white/50">{charity.supporter_count}</td>
                   <td className="px-5 py-4">
                     <div className="flex gap-2">

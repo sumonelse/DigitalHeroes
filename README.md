@@ -7,16 +7,16 @@
 
 ## Tech Stack
 
-| Layer       | Technology |
-|-------------|------------|
-| Framework   | Next.js 16.2 (App Router, Server Actions, PPR) |
-| Database    | Supabase / PostgreSQL |
-| Auth        | Supabase Auth (email/password + magic link) |
-| Payments    | Stripe Subscriptions + Billing Portal |
-| Styling     | Tailwind CSS 4.2 (CSS-native config) |
-| Animation   | Motion 12.38 (motion/react) |
-| Fonts       | Playfair Display + DM Sans |
-| Deployment  | Vercel (new account) + Supabase (new project) |
+| Layer      | Technology                                     |
+| ---------- | ---------------------------------------------- |
+| Framework  | Next.js 16.2 (App Router, Server Actions, PPR) |
+| Database   | Supabase / PostgreSQL                          |
+| Auth       | Supabase Auth (email/password + magic link)    |
+| Payments   | Stripe Subscriptions + Billing Portal          |
+| Styling    | Tailwind CSS 4.2 (CSS-native config)           |
+| Animation  | Motion 12.38 (motion/react)                    |
+| Fonts      | Playfair Display + DM Sans                     |
+| Deployment | Vercel (new account) + Supabase (new project)  |
 
 ---
 
@@ -96,33 +96,39 @@ npm run dev
 ## Supabase Setup
 
 ### 1. Create New Project
+
 - Go to [supabase.com](https://supabase.com) → New Project
 - Region: EU West (Ireland) for lowest latency
 - Save your database password securely
 
 ### 2. Run Schema
+
 - Dashboard → SQL Editor → New query
 - Paste contents of `supabase/schema.sql` → Run
 - Paste contents of `supabase/seed.sql` → Run
 
 ### 3. Configure Auth
+
 - Authentication → Settings
 - Site URL: `https://your-domain.vercel.app`
 - Redirect URLs: `https://your-domain.vercel.app/auth/callback`
 - Email templates: Customize as needed
 
 ### 4. Create Storage Buckets
+
 - Storage → New bucket: `avatars` (public)
 - Storage → New bucket: `charity-media` (public)
 - Storage → New bucket: `winner-proofs` (private)
 
 ### 5. Create Admin User
+
 ```sql
 -- After signing up with your admin email:
 UPDATE public.profiles SET is_admin = true WHERE email = 'admin@yoursite.com';
 ```
 
 ### 6. Regenerate TypeScript Types
+
 ```bash
 npm run db:types
 ```
@@ -132,23 +138,28 @@ npm run db:types
 ## Stripe Setup
 
 ### 1. Create Products
+
 In Stripe Dashboard → Products → Add product:
-- **Monthly Plan**: £9.99/month recurring
-- **Yearly Plan**: £99.99/year recurring
+
+- **Monthly Plan**: ₹9.99/month recurring
+- **Yearly Plan**: ₹99.99/year recurring
 
 Copy the Price IDs, then update in Supabase:
+
 ```sql
 UPDATE platform_settings SET value = '"price_xxx"' WHERE key = 'stripe_monthly_price';
 UPDATE platform_settings SET value = '"price_xxx"' WHERE key = 'stripe_yearly_price';
 ```
 
 ### 2. Configure Webhook
+
 - Stripe Dashboard → Developers → Webhooks → Add endpoint
 - URL: `https://your-domain.vercel.app/api/webhooks/stripe`
 - Events: `checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.payment_failed`
 - Copy webhook secret → add to env as `STRIPE_WEBHOOK_SECRET`
 
 ### 3. Test with Stripe CLI (local)
+
 ```bash
 stripe listen --forward-to localhost:3000/api/webhooks/stripe
 ```
@@ -166,6 +177,7 @@ vercel --prod
 ```
 
 **Required Environment Variables in Vercel:**
+
 ```
 NEXT_PUBLIC_SUPABASE_URL
 NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -203,12 +215,14 @@ NEXT_PUBLIC_APP_URL
 ## Key Features Implemented
 
 ### ✅ Score System
+
 - Rolling 5-score window (DB trigger auto-removes oldest)
 - One score per date (unique constraint)
 - Edit and delete with optimistic UI
 - Score frequency cache for algorithmic draws
 
 ### ✅ Draw Engine
+
 - Random draw: `generate_draw_numbers('random')` — pure lottery
 - Algorithmic draw: weighted by score frequency across all users
 - Admin simulation mode (preview without publishing)
@@ -216,12 +230,14 @@ NEXT_PUBLIC_APP_URL
 - Jackpot rollover to next month
 
 ### ✅ Charity System
+
 - User selects charity at onboarding
 - Configurable contribution % (min 10%)
 - Charity directory with featured/spotlight
 - Contribution tracking per month
 
 ### ✅ Winner Flow
+
 - Eligibility checked: active sub + 5 scores
 - Match calculation via PostgreSQL function
 - Proof upload to Supabase Storage
@@ -229,12 +245,14 @@ NEXT_PUBLIC_APP_URL
 - Payment tracking with reference
 
 ### ✅ Subscription
-- Monthly (£9.99) and Yearly (£99.99) plans
+
+- Monthly (₹9.99) and Yearly (₹99.99) plans
 - Stripe Checkout → webhook → DB update
 - Stripe Customer Portal for self-service
 - Real-time status validation via middleware
 
 ### ✅ RLS & Security
+
 - Row-level security on every table
 - Service role only for privileged operations
 - Admin flag enforced at DB + middleware level
@@ -267,14 +285,14 @@ NEXT_PUBLIC_APP_URL
 
 ## Score Range Reference (Stableford)
 
-| Score | Meaning |
-|-------|---------|
-| 0     | Not valid (min 1) |
-| 1     | Bogey or worse |
-| 2     | Par |
-| 3     | Birdie |
-| 4     | Eagle |
-| 5+    | Albatross+ |
+| Score | Meaning                 |
+| ----- | ----------------------- |
+| 0     | Not valid (min 1)       |
+| 1     | Bogey or worse          |
+| 2     | Par                     |
+| 3     | Birdie                  |
+| 4     | Eagle                   |
+| 5+    | Albatross+              |
 | 45    | Maximum (perfect round) |
 
 Range enforced at DB level (CHECK constraint) and UI level.

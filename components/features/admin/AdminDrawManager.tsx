@@ -97,7 +97,7 @@ export function AdminDrawManager({ draws }: { draws: DrawWithPool[] }) {
                   <span>{draw.total_entries} entries</span>
                   <span>·</span>
                   <span>{draw.total_winners} winners</span>
-                  {pool && <><span>·</span><span>Pool: £{Math.floor(pool.total_pool_gbp).toLocaleString()}</span></>}
+                  {pool && <><span>·</span><span>Pool: ₹{Math.floor(pool.total_pool_gbp).toLocaleString('en-IN')}</span></>}
                 </div>
               </div>
 
@@ -131,7 +131,7 @@ export function AdminDrawManager({ draws }: { draws: DrawWithPool[] }) {
                 ].map(tier => (
                   <div key={tier.label} className="bg-depth/40 px-6 py-4">
                     <div className={`font-display text-xl font-bold ${tier.color}`}>
-                      £{Math.floor(tier.val).toLocaleString()}
+                      ₹{Math.floor(tier.val).toLocaleString('en-IN')}
                     </div>
                     <div className="text-xs text-white/30 mt-0.5">{tier.label}</div>
                   </div>

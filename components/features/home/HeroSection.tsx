@@ -1,19 +1,22 @@
-'use client'
-import { useEffect, useRef, useState } from 'react'
-import Link from 'next/link'
-import { motion } from 'motion/react'
-import type { PrizePool } from '@/types/database'
+"use client";
+import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
+import { motion } from "motion/react";
+import type { PrizePool } from "@/types/database";
 
-const WORDS = ['Lives', 'Communities', 'Futures', 'Dreams', 'Heroes']
+const WORDS = ["Lives", "Communities", "Futures", "Dreams", "Heroes"];
 
 function AnimatedWord() {
-  const [index, setIndex] = useState(0)
+  const [index, setIndex] = useState(0);
   useEffect(() => {
-    const t = setInterval(() => setIndex(i => (i + 1) % WORDS.length), 2500)
-    return () => clearInterval(t)
-  }, [])
+    const t = setInterval(() => setIndex((i) => (i + 1) % WORDS.length), 2500);
+    return () => clearInterval(t);
+  }, []);
   return (
-    <span className="gradient-emerald text-glow-emerald inline-block" key={index}>
+    <span
+      className="gradient-emerald text-glow-emerald inline-block"
+      key={index}
+    >
       <motion.span
         key={index}
         initial={{ opacity: 0, y: 20 }}
@@ -25,39 +28,57 @@ function AnimatedWord() {
         {WORDS[index]}
       </motion.span>
     </span>
-  )
+  );
 }
 
-function CountUp({ target, prefix = '£', duration = 2000 }: { target: number; prefix?: string; duration?: number }) {
-  const [value, setValue] = useState(0)
-  const ref = useRef<HTMLSpanElement>(null)
+function CountUp({
+  target,
+  prefix = "₹",
+  duration = 2000,
+}: {
+  target: number;
+  prefix?: string;
+  duration?: number;
+}) {
+  const [value, setValue] = useState(0);
+  const ref = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(([entry]) => {
-      if (!entry.isIntersecting) return
-      observer.disconnect()
-      const start = Date.now()
-      const tick = () => {
-        const elapsed = Date.now() - start
-        const progress = Math.min(elapsed / duration, 1)
-        const eased = 1 - Math.pow(1 - progress, 3)
-        setValue(Math.floor(eased * target))
-        if (progress < 1) requestAnimationFrame(tick)
-        else setValue(target)
-      }
-      requestAnimationFrame(tick)
-    }, { threshold: 0.5 })
-    if (ref.current) observer.observe(ref.current)
-    return () => observer.disconnect()
-  }, [target, duration])
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        observer.disconnect();
+        const start = Date.now();
+        const tick = () => {
+          const elapsed = Date.now() - start;
+          const progress = Math.min(elapsed / duration, 1);
+          const eased = 1 - Math.pow(1 - progress, 3);
+          setValue(Math.floor(eased * target));
+          if (progress < 1) requestAnimationFrame(tick);
+          else setValue(target);
+        };
+        requestAnimationFrame(tick);
+      },
+      { threshold: 0.5 },
+    );
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [target, duration]);
 
-  return <span ref={ref}>{prefix}{value.toLocaleString()}</span>
+  return (
+    <span ref={ref}>
+      {prefix}
+      {value.toLocaleString()}
+    </span>
+  );
 }
 
-interface HeroProps { prizePool: PrizePool | null }
+interface HeroProps {
+  prizePool: PrizePool | null;
+}
 
 export function HeroSection({ prizePool }: HeroProps) {
-  const jackpot = prizePool?.jackpot_pool_gbp ?? 4250
+  const jackpot = prizePool?.jackpot_pool_gbp ?? 425000;
 
   return (
     <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden pt-20">
@@ -84,7 +105,7 @@ export function HeroSection({ prizePool }: HeroProps) {
             duration: 4 + i,
             delay: i * 0.7,
             repeat: Infinity,
-            ease: 'easeInOut',
+            ease: "easeInOut",
           }}
         >
           {score}
@@ -101,7 +122,9 @@ export function HeroSection({ prizePool }: HeroProps) {
         >
           <span className="w-2 h-2 rounded-full bg-emerald animate-pulse-emerald" />
           <span className="text-sm font-medium text-white/80">
-            Monthly draw open — <span className="text-emerald font-semibold">500 players</span> competing
+            Monthly draw open —{" "}
+            <span className="text-emerald font-semibold">500 players</span>{" "}
+            competing
           </span>
         </motion.div>
 
@@ -127,8 +150,8 @@ export function HeroSection({ prizePool }: HeroProps) {
           transition={{ delay: 0.35, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           className="text-lg md:text-xl text-white/50 max-w-2xl mx-auto mb-10 leading-relaxed"
         >
-          Enter your Stableford scores each month. Match the draw numbers.
-          Win life-changing prizes — while supporting causes that matter.
+          Enter your Stableford scores each month. Match the draw numbers. Win
+          life-changing prizes — while supporting causes that matter.
         </motion.p>
 
         {/* CTA buttons */}
@@ -141,10 +164,19 @@ export function HeroSection({ prizePool }: HeroProps) {
           <Link href="/signup" className="btn-primary text-base px-8 py-4">
             <span>Start Playing</span>
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              <path
+                d="M3 8h10M9 4l4 4-4 4"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
           </Link>
-          <Link href="/how-it-works" className="btn-secondary text-base px-8 py-4">
+          <Link
+            href="/how-it-works"
+            className="btn-secondary text-base px-8 py-4"
+          >
             How It Works
           </Link>
         </motion.div>
@@ -160,22 +192,32 @@ export function HeroSection({ prizePool }: HeroProps) {
             <div className="font-display text-4xl font-bold gradient-emerald mb-1">
               <CountUp target={jackpot} />
             </div>
-            <div className="text-sm text-white/50 font-medium">This Month's Jackpot</div>
-            <div className="text-xs text-white/30 mt-1">rolls over if unclaimed</div>
+            <div className="text-sm text-white/50 font-medium">
+              This Month's Jackpot
+            </div>
+            <div className="text-xs text-white/30 mt-1">
+              rolls over if unclaimed
+            </div>
           </div>
           <div className="glass rounded-2xl p-6 text-center group hover:glass-gold transition-all duration-300">
             <div className="font-display text-4xl font-bold gradient-gold mb-1">
-              <CountUp target={38420} prefix="£" />
+              <CountUp target={38420} prefix="₹" />
             </div>
-            <div className="text-sm text-white/50 font-medium">Raised for Charity</div>
+            <div className="text-sm text-white/50 font-medium">
+              Raised for Charity
+            </div>
             <div className="text-xs text-white/30 mt-1">and counting</div>
           </div>
           <div className="glass rounded-2xl p-6 text-center group hover:border-sapphire/30 hover:bg-sapphire/5 transition-all duration-300">
             <div className="font-display text-4xl font-bold text-white mb-1">
               <CountUp target={847} prefix="" />
             </div>
-            <div className="text-sm text-white/50 font-medium">Active Players</div>
-            <div className="text-xs text-white/30 mt-1">across Ireland & UK</div>
+            <div className="text-sm text-white/50 font-medium">
+              Active Players
+            </div>
+            <div className="text-xs text-white/30 mt-1">
+              across Ireland & UK
+            </div>
           </div>
         </motion.div>
       </div>
@@ -187,7 +229,9 @@ export function HeroSection({ prizePool }: HeroProps) {
         transition={{ delay: 1.2 }}
         className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
       >
-        <span className="text-xs text-white/30 tracking-widest uppercase">Scroll</span>
+        <span className="text-xs text-white/30 tracking-widest uppercase">
+          Scroll
+        </span>
         <motion.div
           animate={{ y: [0, 8, 0] }}
           transition={{ duration: 1.5, repeat: Infinity }}
@@ -195,5 +239,5 @@ export function HeroSection({ prizePool }: HeroProps) {
         />
       </motion.div>
     </section>
-  )
+  );
 }

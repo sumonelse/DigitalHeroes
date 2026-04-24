@@ -24,7 +24,7 @@ const STEPS = [
       </svg>
     ),
     title: "Subscribe",
-    subtitle: "Join for £9.99/mo",
+    subtitle: "Join for ₹999/mo",
     description:
       "Sign up in under 2 minutes. Choose your plan, pick a charity to support, and set your contribution percentage. That's it — you're in.",
     color: "emerald",
@@ -310,7 +310,7 @@ export function HowItWorks() {
             <div className="inline-flex items-center gap-3 glass-gold rounded-full px-6 py-3">
               <span className="text-gold text-xl">🏆</span>
               <span className="font-semibold text-gold">
-                3 numbers matched — £
+                3 numbers matched — ₹
                 {(prizePool?.match3_pool_gbp ?? 1187).toLocaleString()} prize
                 pool!
               </span>

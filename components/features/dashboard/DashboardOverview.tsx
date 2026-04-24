@@ -72,7 +72,7 @@ export function DashboardOverview({ subscription, scores, currentDraw, myEntry, 
             </div>
             <div className="text-right">
               <div className="font-display text-2xl font-bold text-white capitalize">{subscription?.plan ?? '—'}</div>
-              <div className="text-xs text-white/30">{subscription?.plan === 'monthly' ? '£9.99/mo' : '£99.99/yr'}</div>
+              <div className="text-xs text-white/30">{subscription?.plan === 'monthly' ? '₹999/mo' : '₹8,330/yr'}</div>
             </div>
           </div>
           {renewDate && (
@@ -147,7 +147,7 @@ export function DashboardOverview({ subscription, scores, currentDraw, myEntry, 
                     { label: '3-Match', val: currentDraw.prize_pools.match3_pool_gbp },
                   ].map(t => (
                     <div key={t.label} className="text-center">
-                      <div className="text-sm font-bold text-white">£{Math.floor(t.val).toLocaleString()}</div>
+                      <div className="text-sm font-bold text-white">₹{Math.floor(t.val).toLocaleString('en-IN')}</div>
                       <div className="text-[10px] text-white/30">{t.label}</div>
                     </div>
                   ))}
@@ -213,7 +213,7 @@ export function DashboardOverview({ subscription, scores, currentDraw, myEntry, 
           </div>
 
           <div className="font-display text-4xl font-bold text-white mb-1">
-            £{totalWon.toFixed(2)}
+            ₹{totalWon.toFixed(2)}
           </div>
           <div className="text-xs text-white/30 mb-6">Total won, all time</div>
 
@@ -228,7 +228,7 @@ export function DashboardOverview({ subscription, scores, currentDraw, myEntry, 
                     <span className="text-white/60">{w.match_type}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="font-semibold text-white">£{w.prize_amount_gbp.toFixed(2)}</span>
+                    <span className="font-semibold text-white">₹{w.prize_amount_gbp.toFixed(2)}</span>
                     <span className={`text-xs px-2 py-0.5 rounded-full ${
                       w.status === 'paid'     ? 'bg-emerald/10 text-emerald' :
                       w.status === 'verified' ? 'bg-sapphire/10 text-[#4488ff]' :

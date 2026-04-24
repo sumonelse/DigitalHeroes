@@ -151,7 +151,7 @@ export function SettingsPanel({ profile, subscription }: Props) {
               <div className="flex items-center justify-between">
                 <span className="text-sm text-white/50">Amount</span>
                 <span className="text-sm font-semibold text-white">
-                  £{sub.monthly_fee_gbp}/mo
+                  ₹{sub.monthly_fee_gbp}/mo
                 </span>
               </div>
             )}

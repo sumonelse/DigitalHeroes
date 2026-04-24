@@ -8,7 +8,7 @@
 --  [SEED-03] EXTRACT(month/year FROM now()) called twice in separate statements —
 --             risk of month-boundary mismatch; captured once into variables
 --  [SEED-04] active_subscribers = 500 with no real users — misleading; now 0
---  [SEED-05] total_pool_gbp = 4750 inconsistent with 500 × £9.99 = £4,995 —
+--  [SEED-05] total_pool_gbp = 4750 inconsistent with 500 × ₹9.99 = ₹4,995 —
 --             corrected to an honest demo value with a clear comment
 --  [SEED-06] Admin promotion comment was a silent no-op if profile doesn't exist yet —
 --             replaced with a DO block that raises a notice instead of silently failing

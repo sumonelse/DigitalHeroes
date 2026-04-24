@@ -10,9 +10,9 @@ export function PrizePool({ pool }: PrizePoolProps) {
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-100px' })
 
-  const jackpot = pool?.jackpot_pool_gbp ?? 4250
-  const match4  = pool?.match4_pool_gbp  ?? 3718
-  const match3  = pool?.match3_pool_gbp  ?? 2656
+  const jackpot = pool?.jackpot_pool_gbp ?? 425000
+  const match4  = pool?.match4_pool_gbp  ?? 371875
+  const match3  = pool?.match3_pool_gbp  ?? 265625
 
   const tiers = [
     { label: 'Jackpot', match: '5-Number Match', amount: jackpot, pct: '40%', color: 'gold', rollover: true },
@@ -71,7 +71,7 @@ export function PrizePool({ pool }: PrizePoolProps) {
                 tier.color === 'gold' ? 'text-gold' : tier.color === 'emerald' ? 'text-emerald' : 'text-sapphire'
               }`}>{tier.label}</div>
               <div className="font-display text-5xl font-bold text-white mb-1">
-                £{Math.floor(tier.amount).toLocaleString()}
+                ₹{Math.floor(tier.amount).toLocaleString('en-IN')}
               </div>
               <div className="text-white/40 text-sm mb-6">{tier.match}</div>
               <div className={`inline-flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-full ${
@@ -169,7 +169,7 @@ export function CharitySpotlight({ charities }: CharitySpotlightProps) {
               <div className="flex items-center justify-between pt-4 border-t border-white/5">
                 <div>
                   <div className="text-lg font-bold text-white">
-                    £{Math.floor(charity.total_raised_gbp ?? 0).toLocaleString()}
+                    ₹{Math.floor(charity.total_raised_gbp ?? 0).toLocaleString('en-IN')}
                   </div>
                   <div className="text-xs text-white/30">raised total</div>
                 </div>
@@ -187,9 +187,9 @@ export function CharitySpotlight({ charities }: CharitySpotlightProps) {
 }
 
 /* ── Pricing Section ────────────────────────────────────────── */
-const MONTHLY_PRICE = 9.99
-const YEARLY_PRICE  = 99.99
+const MONTHLY_PRICE = 999
 
+const YEARLY_PRICE  = 8330
 export function PricingSection() {
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-100px' })
@@ -217,7 +217,7 @@ export function PricingSection() {
       label: 'Yearly',
       price: YEARLY_PRICE,
       period: 'per year',
-      tagline: `Save £${(MONTHLY_PRICE * 12 - YEARLY_PRICE).toFixed(2)} vs monthly`,
+      tagline: `Save ₹${((MONTHLY_PRICE * 12 - YEARLY_PRICE)/100).toFixed(0)} vs monthly`,
       features: [
         'Everything in Monthly',
         '2 months free',
@@ -281,7 +281,7 @@ export function PricingSection() {
                 <p className="text-white/40 text-sm font-semibold uppercase tracking-widest mb-2">{plan.label}</p>
                 <div className="flex items-end gap-2 mb-1">
                   <span className="font-display text-5xl font-bold text-white">
-                    £{plan.price.toFixed(2)}
+                    ₹{plan.price.toLocaleString('en-IN')}
                   </span>
                   <span className="text-white/40 text-sm pb-2">{plan.period}</span>
                 </div>

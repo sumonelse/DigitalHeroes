@@ -119,7 +119,7 @@ export async function handleStripeWebhook(event: Stripe.Event) {
         status: 'active',
         current_period_start: new Date(stripeSubscription.current_period_start * 1000).toISOString(),
         current_period_end: new Date(stripeSubscription.current_period_end * 1000).toISOString(),
-        monthly_fee_gbp: plan === 'monthly' ? 9.99 : 8.33,
+        monthly_fee_gbp: plan === 'monthly' ? 999 : 694,
       }, { onConflict: 'user_id' })
 
       await supabase.from('audit_logs').insert({

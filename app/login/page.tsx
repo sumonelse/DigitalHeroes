@@ -36,8 +36,8 @@ export default function LoginPage() {
           </blockquote>
           <div className="flex items-center gap-6">
             {[
-              { label: 'Prize Pool', value: '£4,250+' },
-              { label: 'For Charity', value: '£38k+' },
+              { label: 'Prize Pool', value: '₹4,25,000+' },
+              { label: 'For Charity', value: '₹38L+' },
               { label: 'Members', value: '847' },
             ].map(stat => (
               <div key={stat.label}>

@@ -39,8 +39,8 @@ export function AdminOverview({ stats, revenue }: Props) {
   const statCards = [
     { label: 'Total Users',         value: stats?.total_users ?? 0,          color: 'white',   icon: '👥', href: '/admin/users' },
     { label: 'Active Subscribers',  value: stats?.active_subscribers ?? 0,   color: 'emerald', icon: '✅', href: '/admin/users' },
-    { label: 'Charity Raised',      value: `£${(stats?.total_charity_raised ?? 0).toFixed(0)}`, color: 'gold', icon: '💚', href: '/admin/charities' },
-    { label: 'Current Prize Pool',  value: `£${(stats?.current_prize_pool ?? 0).toFixed(0)}`, color: 'sapphire', icon: '🎯', href: '/admin/draws' },
+    { label: 'Charity Raised',      value: `₹${(stats?.total_charity_raised ?? 0).toFixed(0)}`, color: 'gold', icon: '💚', href: '/admin/charities' },
+    { label: 'Current Prize Pool',  value: `₹${(stats?.current_prize_pool ?? 0).toFixed(0)}`, color: 'sapphire', icon: '🎯', href: '/admin/draws' },
     { label: 'Pending Winners',     value: stats?.pending_winners ?? 0,      color: stats?.pending_winners ? 'rose' : 'white', icon: '🏆', href: '/admin/winners' },
     { label: 'Total Draws Run',     value: stats?.total_draws_run ?? 0,      color: 'violet', icon: '📋', href: '/admin/draws' },
   ]
@@ -120,7 +120,7 @@ export function AdminOverview({ stats, revenue }: Props) {
               const pct = (m.total_pool_gbp / maxPool) * 100
               return (
                 <div key={`${m.period_year}-${m.period_month}`} className="flex-1 flex flex-col items-center gap-2">
-                  <div className="text-xs text-white/50 font-mono">£{Math.floor(m.total_pool_gbp / 1000)}k</div>
+                  <div className="text-xs text-white/50 font-mono">₹{Math.floor(m.total_pool_gbp / 100000)}L</div>
                   <div className="w-full flex items-end" style={{ height: '100px' }}>
                     <motion.div
                       className="w-full bg-gradient-to-t from-emerald to-emerald/40 rounded-t-lg"

@@ -30,7 +30,7 @@ export default async function AdminAnalyticsPage() {
               const pct = (m.total_pool_gbp / maxPool) * 100;
               return (
                 <div key={`${m.period_year}-${m.period_month}`} className="flex-1 flex flex-col items-center gap-2">
-                  <div className="text-xs text-white/50 font-mono">£{Math.floor(m.total_pool_gbp / 1000)}k</div>
+                  <div className="text-xs text-white/50 font-mono">₹{Math.floor(m.total_pool_gbp / 100000)}L</div>
                   <div className="w-full flex items-end" style={{ height: '100px' }}>
                     <div
                       className="w-full bg-gradient-to-t from-emerald to-emerald/40 rounded-t-lg"
@@ -51,8 +51,8 @@ export default async function AdminAnalyticsPage() {
             {[
               { label: "Total Users", value: stats?.total_users ?? 0 },
               { label: "Active Subscribers", value: stats?.active_subscribers ?? 0 },
-              { label: "Total Raised for Charity", value: `£${(stats?.total_charity_raised ?? 0).toLocaleString()}` },
-              { label: "Current Prize Pool", value: `£${(stats?.current_prize_pool ?? 0).toLocaleString()}` },
+              { label: "Total Raised for Charity", value: `₹${(stats?.total_charity_raised ?? 0).toLocaleString('en-IN')}` },
+              { label: "Current Prize Pool", value: `₹${(stats?.current_prize_pool ?? 0).toLocaleString('en-IN')}` },
               { label: "Draws Run", value: stats?.total_draws_run ?? 0 },
               { label: "Pending Winner Reviews", value: stats?.pending_winners ?? 0 },
             ].map((metric) => (

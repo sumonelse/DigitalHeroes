@@ -238,8 +238,8 @@ CREATE TABLE public.platform_settings (
 );
 
 INSERT INTO public.platform_settings (key, value, description) VALUES
-  ('monthly_price_gbp',    '9.99'::jsonb,                          'Monthly subscription price in GBP'),
-  ('yearly_price_gbp',     '99.99'::jsonb,                         'Yearly subscription price in GBP'),
+  ('monthly_price_gbp',    '999'::jsonb,                          'Monthly subscription price in INR'),
+  ('yearly_price_gbp',     '8330'::jsonb,                         'Yearly subscription price in INR'),
   ('stripe_monthly_price', '"price_monthly_placeholder"'::jsonb,   'Stripe Price ID for monthly plan'),
   ('stripe_yearly_price',  '"price_yearly_placeholder"'::jsonb,    'Stripe Price ID for yearly plan'),
   ('prize_pool_pct',       '{"5match":40,"4match":35,"3match":25}'::jsonb, 'Prize pool distribution percentages'),
@@ -421,9 +421,9 @@ BEGIN
   FROM public.platform_settings WHERE key = 'yearly_price_gbp';
 
   IF NEW.plan = 'yearly' THEN
-    NEW.monthly_fee_gbp := ROUND(COALESCE(v_yearly_price, 99.99) / 12, 2);
+    NEW.monthly_fee_gbp := ROUND(COALESCE(v_yearly_price, 8330) / 12, 2);
   ELSE
-    NEW.monthly_fee_gbp := COALESCE(v_monthly_price, 9.99);
+    NEW.monthly_fee_gbp := COALESCE(v_monthly_price, 999);
   END IF;
 
   RETURN NEW;

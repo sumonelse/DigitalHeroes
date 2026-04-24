@@ -102,8 +102,8 @@ export function WinnersPortal({ winners: initial, userId }: { winners: WinnerRow
       {/* Summary */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[
-          { label: 'Total Won', value: `£${totalWon.toFixed(2)}`, color: 'text-white' },
-          { label: 'Paid Out', value: `£${totalPaid.toFixed(2)}`, color: 'text-emerald' },
+          { label: 'Total Won', value: `₹${totalWon.toFixed(2)}`, color: 'text-white' },
+          { label: 'Paid Out', value: `₹${totalPaid.toFixed(2)}`, color: 'text-emerald' },
           { label: 'Pending', value: pending.length, color: pending.length > 0 ? 'text-gold' : 'text-white/40' },
         ].map(s => (
           <div key={s.label} className="glass rounded-2xl p-5">
@@ -163,7 +163,7 @@ export function WinnersPortal({ winners: initial, userId }: { winners: WinnerRow
 
               <div className="text-right flex-shrink-0">
                 <div className="font-display text-2xl font-bold text-white">
-                  £{winner.prize_amount_gbp.toFixed(2)}
+                  ₹{winner.prize_amount_gbp.toFixed(2)}
                 </div>
                 <div className="text-xs text-white/30">prize amount</div>
               </div>

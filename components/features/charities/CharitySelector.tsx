@@ -96,7 +96,7 @@ export function CharitySelector({ charities, selectedId, percentage: initPct }: 
 
             <div className="flex items-center gap-4 mt-3">
               <div className="text-xs">
-                <span className="font-semibold text-white">£{Math.floor(charity.total_raised_gbp).toLocaleString()}</span>
+                <span className="font-semibold text-white">₹{Math.floor(charity.total_raised_gbp).toLocaleString('en-IN')}</span>
                 <span className="text-white/30 ml-1">raised</span>
               </div>
               <div className="text-xs">
@@ -204,7 +204,7 @@ export function CharitySelector({ charities, selectedId, percentage: initPct }: 
           <div className="text-center mb-6">
             <span className="font-display text-5xl font-bold text-emerald">{pct}%</span>
             <div className="text-xs text-white/30 mt-1">of your subscription</div>
-            <div className="text-sm font-semibold text-white mt-2">= £{monthlyContrib} / month</div>
+            <div className="text-sm font-semibold text-white mt-2">= ₹{monthlyContrib} / month</div>
           </div>
 
           <input

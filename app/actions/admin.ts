@@ -136,7 +136,7 @@ export async function adminGetWinners(status?: string) {
     .from('winners')
     .select(`
       *,
-      profiles(full_name, email),
+      profiles!winners_user_id_fkey(full_name, email),
       draws(period_month, period_year, winning_numbers)
     `)
     .order('created_at', { ascending: false })

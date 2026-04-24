@@ -1,10 +1,13 @@
 import { getAuthUser } from "@/lib/supabase/server";
+import { connection } from "next/server";
 import { getUserScores } from "@/app/actions/scores";
 import { ScoreManager } from "@/components/features/scores/ScoreManager";
 
 export const metadata = { title: "My Scores" };
 
 export default async function ScoresPage() {
+  await connection();
+
   const user = await getAuthUser();
   const scores = await getUserScores().catch(() => []);
 

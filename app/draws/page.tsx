@@ -1,11 +1,11 @@
-import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/server";
 import { Navigation } from "@/components/features/home/Navigation";
 import { Footer } from "@/components/features/home/Footer";
 
 export const metadata = { title: "Monthly Draws" };
 
 async function getDraws() {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data } = await supabase
     .from("draws")
     .select("*, prize_pools(*)")

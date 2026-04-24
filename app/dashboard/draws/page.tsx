@@ -3,10 +3,13 @@ import { getUserScores } from "@/app/actions/scores";
 import { DrawEntry } from "@/components/features/draws/DrawEntry";
 import { createClient } from "@/lib/supabase/server";
 import { getAuthUser } from "@/lib/supabase/server";
+import { connection } from "next/server";
 
 export const metadata = { title: "Monthly Draw" };
 
 export default async function DrawsPage() {
+  await connection();
+
   const user = await getAuthUser();
   const supabase = await createClient();
 

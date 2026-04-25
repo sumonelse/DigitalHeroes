@@ -137,7 +137,7 @@ export async function handleStripeWebhook(event: Stripe.Event) {
         break;
       }
 
-      const subscriptionItem = stripeSubscription.items.data[0];
+      const subscriptionItem = stripeSubscription.items.data[0] as Stripe.SubscriptionItem;
       const periodStart = Number(subscriptionItem?.current_period_start) * 1000;
       const periodEnd = Number(subscriptionItem?.current_period_end) * 1000;
 
@@ -175,7 +175,7 @@ export async function handleStripeWebhook(event: Stripe.Event) {
       const userId = sub.metadata?.supabase_uid;
       if (!userId) break;
 
-      const subscriptionItem = sub.items.data[0];
+      const subscriptionItem = sub.items.data[0] as Stripe.SubscriptionItem;
       const periodStart = Number(subscriptionItem?.current_period_start) * 1000;
       const periodEnd = Number(subscriptionItem?.current_period_end) * 1000;
 

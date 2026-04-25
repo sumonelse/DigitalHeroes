@@ -334,10 +334,10 @@ BEGIN
 
   SELECT COALESCE(SUM(frequency), 0) INTO v_total FROM public.score_frequency_cache;
   IF v_total > 0 THEN
-    UPDATE public.score_frequency_cache SET weight = ROUND(frequency::NUMERIC / v_total, 8);
+    UPDATE public.score_frequency_cache SET weight = ROUND(frequency::NUMERIC / v_total, 8) WHERE true;
   ELSE
     -- [FIX-08] Use exact expression instead of truncated literal
-    UPDATE public.score_frequency_cache SET weight = ROUND(1.0 / 45, 8);
+    UPDATE public.score_frequency_cache SET weight = ROUND(1.0 / 45, 8) WHERE true;
   END IF;
 
   IF TG_OP = 'DELETE' THEN RETURN OLD; END IF;

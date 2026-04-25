@@ -9,10 +9,10 @@ type UserScore = Database['public']['Functions']['get_user_scores']['Returns'][0
 export async function enterDraw(drawId: string) {
   try {
     const user = await getAuthUser()
-    const supabase = await createClient()
+    const serviceClient = await createServiceClient()
 
     // Check eligibility
-    const { data: eligibility } = await supabase.rpc('check_draw_eligibility', { p_user_id: user.id })
+    const { data: eligibility } = await serviceClient.rpc('check_draw_eligibility', { p_user_id: user.id })
     if (!eligibility?.eligible) {
       const reason = !eligibility?.sub_active
         ? 'Active subscription required.'
@@ -21,7 +21,7 @@ export async function enterDraw(drawId: string) {
     }
 
     // Get current scores
-    const { data: scores } = await supabase.rpc('get_user_scores', { p_user_id: user.id })
+    const { data: scores } = await serviceClient.rpc('get_user_scores', { p_user_id: user.id })
     if (!scores || scores.length !== 5) {
       return { success: false, error: 'You need exactly 5 scores to enter the draw.' }
     }
@@ -29,7 +29,7 @@ export async function enterDraw(drawId: string) {
     const submittedScores = scores.map((s: UserScore) => s.score)
 
     // Enter draw
-    const { error } = await supabase.from('draw_entries').upsert({
+    const { error } = await serviceClient.from('draw_entries').upsert({
       draw_id: drawId,
       user_id: user.id,
       submitted_scores: submittedScores,

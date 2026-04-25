@@ -133,16 +133,25 @@ export async function handleStripeWebhook(event: Stripe.Event) {
           session.subscription as string,
         );
       } catch (err: any) {
-        console.error("[Webhook] Failed to retrieve subscription:", err?.message);
+        console.error(
+          "[Webhook] Failed to retrieve subscription:",
+          err?.message,
+        );
         break;
       }
 
-      const subscriptionItem = stripeSubscription.items.data[0] as Stripe.SubscriptionItem;
-      const periodStart = Number(subscriptionItem?.current_period_start) * 1000;
-      const periodEnd = Number(subscriptionItem?.current_period_end) * 1000;
+      const subscriptionItem = stripeSubscription.items
+        .data[0] as Stripe.SubscriptionItem;
+      const periodStart =
+        Number(stripeSubscription.current_period_start) * 1000;
+      const periodEnd = Number(stripeSubscription.current_period_end) * 1000;
 
       if (!Number.isFinite(periodStart) || !Number.isFinite(periodEnd)) {
-        console.error("[Webhook] Invalid period dates:", periodStart, periodEnd);
+        console.error(
+          "[Webhook] Invalid period dates:",
+          periodStart,
+          periodEnd,
+        );
         break;
       }
 
@@ -176,8 +185,8 @@ export async function handleStripeWebhook(event: Stripe.Event) {
       if (!userId) break;
 
       const subscriptionItem = sub.items.data[0] as Stripe.SubscriptionItem;
-      const periodStart = Number(subscriptionItem?.current_period_start) * 1000;
-      const periodEnd = Number(subscriptionItem?.current_period_end) * 1000;
+      const periodStart = Number(sub.current_period_start) * 1000;
+      const periodEnd = Number(sub.current_period_end) * 1000;
 
       const statusMap: Record<string, string> = {
         active: "active",
@@ -192,8 +201,12 @@ export async function handleStripeWebhook(event: Stripe.Event) {
         .from("subscriptions")
         .update({
           status: (statusMap[sub.status] ?? "inactive") as any,
-          current_period_start: Number.isFinite(periodStart) ? new Date(periodStart).toISOString() : null,
-          current_period_end: Number.isFinite(periodEnd) ? new Date(periodEnd).toISOString() : null,
+          current_period_start: Number.isFinite(periodStart)
+            ? new Date(periodStart).toISOString()
+            : null,
+          current_period_end: Number.isFinite(periodEnd)
+            ? new Date(periodEnd).toISOString()
+            : null,
           cancel_at_period_end: sub.cancel_at_period_end,
           cancelled_at: sub.canceled_at
             ? new Date(Number(sub.canceled_at) * 1000).toISOString()

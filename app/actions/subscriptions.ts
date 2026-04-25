@@ -122,11 +122,32 @@ export async function handleStripeWebhook(event: Stripe.Event) {
       const session = event.data.object as Stripe.Checkout.Session;
       const userId = session.metadata?.supabase_uid;
       const plan = (session.metadata?.plan ?? "monthly") as SubscriptionPlan;
-      if (!userId) break;
+      if (!userId) {
+        console.error("[Webhook] No userId in metadata");
+        break;
+      }
 
-      const stripeSubscription = await stripe.subscriptions.retrieve(
-        session.subscription as string,
-      );
+      let stripeSubscription: Stripe.Subscription;
+      try {
+        stripeSubscription = await stripe.subscriptions.retrieve(
+          session.subscription as string,
+        );
+      } catch (err: any) {
+        console.error("[Webhook] Failed to retrieve subscription:", err?.message);
+        break;
+      }
+
+      console.log("[Webhook] Retrieved subscription:", stripeSubscription.id);
+      console.log("[Webhook] current_period_start:", stripeSubscription.current_period_start, typeof stripeSubscription.current_period_start);
+      console.log("[Webhook] current_period_end:", stripeSubscription.current_period_end, typeof stripeSubscription.current_period_end);
+
+      const periodStart = Number(stripeSubscription.current_period_start);
+      const periodEnd = Number(stripeSubscription.current_period_end);
+
+      if (!Number.isFinite(periodStart) || !Number.isFinite(periodEnd)) {
+        console.error("[Webhook] Invalid period dates:", periodStart, periodEnd);
+        break;
+      }
 
       await supabase.from("subscriptions").upsert(
         {
@@ -136,12 +157,8 @@ export async function handleStripeWebhook(event: Stripe.Event) {
           stripe_price_id: stripeSubscription.items.data[0].price.id,
           plan,
           status: "active",
-          current_period_start: new Date(
-            stripeSubscription.current_period_start * 1000,
-          ).toISOString(),
-          current_period_end: new Date(
-            stripeSubscription.current_period_end * 1000,
-          ).toISOString(),
+          current_period_start: new Date(periodStart * 1000).toISOString(),
+          current_period_end: new Date(periodEnd * 1000).toISOString(),
           monthly_fee_gbp: plan === "monthly" ? 999 : 694,
         },
         { onConflict: "user_id" },

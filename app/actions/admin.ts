@@ -58,6 +58,8 @@ export async function adminUpdateUserScore(
 
   if (error) return { error: error.message };
   revalidatePath("/admin/users");
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard/scores");
   return { success: true };
 }
 
@@ -74,6 +76,9 @@ export async function adminToggleSubscription(
 
   if (error) return { error: error.message };
   revalidatePath("/admin/users");
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard/draws");
+  revalidatePath("/dashboard/settings");
   return { success: true };
 }
 
@@ -103,6 +108,8 @@ export async function adminCreateCharity(formData: FormData) {
   if (error) return { error: error.message };
   revalidatePath("/admin/charities");
   revalidatePath("/charities");
+  revalidatePath("/dashboard/charities");
+  revalidatePath("/dashboard/settings");
   return { success: true };
 }
 
@@ -128,6 +135,8 @@ export async function adminUpdateCharity(id: string, formData: FormData) {
   if (error) return { error: error.message };
   revalidatePath("/admin/charities");
   revalidatePath("/charities");
+  revalidatePath("/dashboard/charities");
+  revalidatePath("/dashboard/settings");
   return { success: true };
 }
 
@@ -155,6 +164,9 @@ export async function adminDeleteCharity(id: string) {
   if (error) return { error: error.message };
 
   revalidatePath("/admin/charities");
+  revalidatePath("/charities");
+  revalidatePath("/dashboard/charities");
+  revalidatePath("/dashboard/settings");
   return { success: true };
 }
 
@@ -201,6 +213,8 @@ export async function adminVerifyWinner(
 
   if (error) return { error: error.message };
   revalidatePath("/admin/winners");
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard/winners");
   return { success: true };
 }
 
@@ -221,6 +235,8 @@ export async function adminMarkWinnerPaid(winnerId: string, reference: string) {
 
   if (error) return { error: error.message };
   revalidatePath("/admin/winners");
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard/winners");
   return { success: true };
 }
 
@@ -241,10 +257,16 @@ export async function adminCreateNextMonthPool() {
     .eq("status", "active");
 
   const totalFees =
-    subs?.reduce((acc: number, s: { monthly_fee_gbp: number }) => acc + s.monthly_fee_gbp, 0) ?? 0;
+    subs?.reduce(
+      (acc: number, s: { monthly_fee_gbp: number }) => acc + s.monthly_fee_gbp,
+      0,
+    ) ?? 0;
   const avgCharity =
-    (subs?.reduce((acc: number, s: { charity_percentage: number }) => acc + s.charity_percentage, 0) ||
-      0) / (subs?.length || 1) || 10;
+    (subs?.reduce(
+      (acc: number, s: { charity_percentage: number }) =>
+        acc + s.charity_percentage,
+      0,
+    ) || 0) / (subs?.length || 1) || 10;
 
   // Prize pool = fees minus charity portion
   const charityTotal = totalFees * (avgCharity / 100);
@@ -283,6 +305,9 @@ export async function adminCreateNextMonthPool() {
 
   revalidatePath("/admin");
   revalidatePath("/admin/draws");
+  revalidatePath("/draws");
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard/draws");
   return { success: true, pool };
 }
 

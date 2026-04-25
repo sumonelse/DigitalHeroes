@@ -148,8 +148,16 @@ export async function updateCharitySettings(formData: FormData) {
   const user = await getAuthUser();
   const supabase = await createClient();
 
-  const charityId = formData.get("charity_id") as string;
+  const charityId = String(formData.get("charity_id") ?? "").trim();
   const percentage = Number(formData.get("charity_percentage"));
+
+  if (!charityId) {
+    return { error: "Please choose a charity." };
+  }
+
+  if (!Number.isFinite(percentage)) {
+    return { error: "Charity percentage is invalid." };
+  }
 
   if (percentage < 10 || percentage > 100) {
     return { error: "Charity percentage must be between 10% and 100%." };

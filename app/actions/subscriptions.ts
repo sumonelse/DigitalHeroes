@@ -138,7 +138,7 @@ export async function createCustomerPortalSession(): Promise<never> {
 
   const session = await stripe.billingPortal.sessions.create({
     customer: sub.stripe_customer_id,
-    return_url: `${process.env.NEXT_PUBLIC_APP_URL}/settings`,
+    return_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/settings`,
   });
 
   redirect(session.url);
@@ -155,15 +155,16 @@ export async function updateCharitySettings(formData: FormData) {
     return { error: "Charity percentage must be between 10% and 100%." };
   }
 
-  const { error } = await supabase
-    .from("subscriptions")
-    .update({ selected_charity_id: charityId, charity_percentage: percentage })
-    .eq("user_id", user.id);
+  const { error } = await supabase.rpc("update_charity_preference", {
+    p_charity_id: charityId || null,
+    p_charity_percentage: percentage,
+  });
 
   if (error) return { error: "Failed to update charity settings." };
 
   revalidatePath("/dashboard");
-  revalidatePath("/settings");
+  revalidatePath("/dashboard/charities");
+  revalidatePath("/dashboard/settings");
   return { success: true };
 }
 

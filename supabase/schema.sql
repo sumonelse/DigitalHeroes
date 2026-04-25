@@ -672,6 +672,63 @@ BEGIN
 END;
 $$;
 
+-- Apply rollover from current draw's pool to next month's pool (called after draw published)
+CREATE OR REPLACE FUNCTION public.apply_rollover_to_next_pool(p_current_draw_id UUID)
+RETURNS NUMERIC LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+DECLARE
+  v_current_pool_id UUID;
+  v_current_pool    RECORD;
+  v_next_pool       RECORD;
+  v_rollover        NUMERIC := 0;
+  v_next_month      INTEGER;
+  v_next_year       INTEGER;
+BEGIN
+  -- Get current draw's prize pool
+  SELECT prize_pool_id INTO v_current_pool_id
+  FROM public.draws WHERE id = p_current_draw_id;
+
+  IF v_current_pool_id IS NULL THEN
+    RETURN 0;  -- No pool linked
+  END IF;
+
+  -- Get current pool details
+  SELECT * INTO v_current_pool FROM public.prize_pools WHERE id = v_current_pool_id;
+
+  IF NOT FOUND OR v_current_pool.jackpot_rolled_over = false THEN
+    RETURN 0;  -- No rollover to apply
+  END IF;
+
+  -- Calculate next month/year
+  IF v_current_pool.period_month = 12 THEN
+    v_next_month := 1;
+    v_next_year := v_current_pool.period_year + 1;
+  ELSE
+    v_next_month := v_current_pool.period_month + 1;
+    v_next_year := v_current_pool.period_year;
+  END IF;
+
+  -- Find next month's pool
+  SELECT * INTO v_next_pool FROM public.prize_pools
+  WHERE period_month = v_next_month AND period_year = v_next_year;
+
+  IF NOT FOUND THEN
+    RETURN 0;  -- Next pool doesn't exist yet
+  END IF;
+
+  -- Apply rollover
+  v_rollover := COALESCE(v_current_pool.rollover_amount_gbp, 0);
+  IF v_rollover > 0 THEN
+    UPDATE public.prize_pools
+    SET rollover_amount_gbp = COALESCE(rollover_amount_gbp, 0) + v_rollover
+    WHERE id = v_next_pool.id;
+
+    PERFORM public.recalculate_prize_pool(v_next_pool.id);
+  END IF;
+
+  RETURN v_rollover;
+END;
+$$;
+
 -- ── [FIX-04] Secure proof upload via SECURITY DEFINER function ──
 -- Original: winners_upload_proof RLS policy (FOR UPDATE ... WITH CHECK status='pending')
 -- let users overwrite ANY column including prize_amount_gbp.
@@ -753,7 +810,7 @@ BEGIN
     'active_subscribers',   (SELECT COUNT(*) FROM public.subscriptions WHERE status = 'active'),
     'total_charity_raised', (SELECT COALESCE(SUM(total_raised_gbp), 0) FROM public.charities),
     'current_prize_pool',   (
-                              SELECT COALESCE(jackpot_pool_gbp + match4_pool_gbp + match3_pool_gbp, 0)
+                              SELECT jackpot_pool_gbp + match4_pool_gbp + match3_pool_gbp
                               FROM public.prize_pools
                               WHERE period_year  = EXTRACT(year  FROM now())::INTEGER
                                 AND period_month = EXTRACT(month FROM now())::INTEGER
@@ -949,6 +1006,7 @@ GRANT EXECUTE ON FUNCTION public.generate_draw_numbers(draw_logic)   TO service_
 GRANT EXECUTE ON FUNCTION public.process_draw_results(UUID)          TO service_role;
 GRANT EXECUTE ON FUNCTION public.recalculate_prize_pool(UUID)        TO service_role;
 GRANT EXECUTE ON FUNCTION public.apply_jackpot_rollover(UUID)        TO service_role;   -- [FIX-10]
+GRANT EXECUTE ON FUNCTION public.apply_rollover_to_next_pool(UUID)       TO service_role;
 
 -- ============================================================
 -- STORAGE BUCKETS (run via Supabase dashboard or migration)

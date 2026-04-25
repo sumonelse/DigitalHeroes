@@ -280,6 +280,8 @@ export async function adminCreateNextMonthPool() {
         period_year: year,
         total_pool_gbp: Math.round(poolTotal * 100) / 100,
         active_subscribers: subs?.length ?? 0,
+        jackpot_rolled_over: false,
+        rollover_amount_gbp: 0,
       },
       { onConflict: "period_month,period_year" },
     )
@@ -291,6 +293,9 @@ export async function adminCreateNextMonthPool() {
 
   // Recalculate tiers
   await supabase.rpc("recalculate_prize_pool", { p_pool_id: pool.id });
+
+  // Apply any pending rollover from previous pool
+  await supabase.rpc("apply_jackpot_rollover", { p_new_pool_id: pool.id });
 
   // Create draw for next month
   await supabase.from("draws").upsert(

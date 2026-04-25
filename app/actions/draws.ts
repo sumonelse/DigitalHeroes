@@ -120,24 +120,13 @@ export async function adminPublishDraw(drawId: string, confirmedNumbers?: number
 
   const { data: results } = await serviceClient.rpc('process_draw_results', { p_draw_id: drawId })
 
-  const next = await serviceClient.from('prize_pools')
-    .select('id, rollover_amount_gbp')
-    .eq('period_month', new Date().getMonth() + 2 > 12 ? 1 : new Date().getMonth() + 2)
-    .eq('period_year', new Date().getMonth() + 2 > 12 ? new Date().getFullYear() + 1 : new Date().getFullYear())
-    .single()
-
   type DrawResults = {
     jackpot_rolled?: boolean
     winners_by_match?: Record<string, unknown>
   }
 
-  if ((results as DrawResults)?.jackpot_rolled && next.data) {
-    const { data: currentPool } = await serviceClient.from('prize_pools').select('jackpot_pool_gbp').eq('id', (await serviceClient.from('draws').select('prize_pool_id').eq('id', drawId).single()).data?.prize_pool_id ?? '').single()
-    if (currentPool) {
-      await serviceClient.from('prize_pools').update({
-        rollover_amount_gbp: next.data.rollover_amount_gbp + currentPool.jackpot_pool_gbp,
-      }).eq('id', next.data.id)
-    }
+  if ((results as DrawResults)?.jackpot_rolled) {
+    await serviceClient.rpc('apply_rollover_to_next_pool', { p_current_draw_id: drawId })
   }
 
   await serviceClient.from('draws').update({

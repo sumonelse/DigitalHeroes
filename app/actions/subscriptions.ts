@@ -137,12 +137,9 @@ export async function handleStripeWebhook(event: Stripe.Event) {
         break;
       }
 
-      console.log("[Webhook] Retrieved subscription:", stripeSubscription.id);
-      console.log("[Webhook] current_period_start:", stripeSubscription.current_period_start, typeof stripeSubscription.current_period_start);
-      console.log("[Webhook] current_period_end:", stripeSubscription.current_period_end, typeof stripeSubscription.current_period_end);
-
-      const periodStart = Number(stripeSubscription.current_period_start);
-      const periodEnd = Number(stripeSubscription.current_period_end);
+      const subscriptionItem = stripeSubscription.items.data[0];
+      const periodStart = Number(subscriptionItem?.current_period_start) * 1000;
+      const periodEnd = Number(subscriptionItem?.current_period_end) * 1000;
 
       if (!Number.isFinite(periodStart) || !Number.isFinite(periodEnd)) {
         console.error("[Webhook] Invalid period dates:", periodStart, periodEnd);
@@ -154,11 +151,11 @@ export async function handleStripeWebhook(event: Stripe.Event) {
           user_id: userId,
           stripe_customer_id: session.customer as string,
           stripe_subscription_id: stripeSubscription.id,
-          stripe_price_id: stripeSubscription.items.data[0].price.id,
+          stripe_price_id: subscriptionItem.price.id,
           plan,
           status: "active",
-          current_period_start: new Date(periodStart * 1000).toISOString(),
-          current_period_end: new Date(periodEnd * 1000).toISOString(),
+          current_period_start: new Date(periodStart).toISOString(),
+          current_period_end: new Date(periodEnd).toISOString(),
           monthly_fee_gbp: plan === "monthly" ? 999 : 694,
         },
         { onConflict: "user_id" },
@@ -178,6 +175,10 @@ export async function handleStripeWebhook(event: Stripe.Event) {
       const userId = sub.metadata?.supabase_uid;
       if (!userId) break;
 
+      const subscriptionItem = sub.items.data[0];
+      const periodStart = Number(subscriptionItem?.current_period_start) * 1000;
+      const periodEnd = Number(subscriptionItem?.current_period_end) * 1000;
+
       const statusMap: Record<string, string> = {
         active: "active",
         past_due: "past_due",
@@ -191,15 +192,11 @@ export async function handleStripeWebhook(event: Stripe.Event) {
         .from("subscriptions")
         .update({
           status: (statusMap[sub.status] ?? "inactive") as any,
-          current_period_start: new Date(
-            sub.current_period_start * 1000,
-          ).toISOString(),
-          current_period_end: new Date(
-            sub.current_period_end * 1000,
-          ).toISOString(),
+          current_period_start: Number.isFinite(periodStart) ? new Date(periodStart).toISOString() : null,
+          current_period_end: Number.isFinite(periodEnd) ? new Date(periodEnd).toISOString() : null,
           cancel_at_period_end: sub.cancel_at_period_end,
           cancelled_at: sub.canceled_at
-            ? new Date(sub.canceled_at * 1000).toISOString()
+            ? new Date(Number(sub.canceled_at) * 1000).toISOString()
             : null,
         })
         .eq("stripe_subscription_id", sub.id);

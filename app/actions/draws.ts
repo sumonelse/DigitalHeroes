@@ -4,6 +4,14 @@ import { createClient, createServiceClient, getAuthUser } from '@/lib/supabase/s
 import { z } from 'zod'
 import type { Database } from '@/types/database'
 
+async function requireAdmin() {
+  const user = await getAuthUser()
+  const supabase = await createClient()
+  const { data: profile } = await supabase.from('profiles').select('is_admin').eq('id', user.id).single()
+  if (!profile?.is_admin) throw new Error('Admin only')
+  return user
+}
+
 type UserScore = Database['public']['Functions']['get_user_scores']['Returns'][0]
 
 export async function enterDraw(drawId: string) {
@@ -76,22 +84,14 @@ export async function getActiveDrawWithEntry() {
 // ── Admin Actions ─────────────────────────────────────────────
 
 export async function adminRunDrawSimulation(drawId: string) {
-  const user = await getAuthUser()
-  const supabase = await createClient()
-
-  const { data: profile } = await supabase.from('profiles').select('is_admin').eq('id', user.id).single()
-  if (!profile?.is_admin) return { success: false, error: 'Admin only.' }
-
+  await requireAdmin()
   const serviceClient = await createServiceClient()
 
-  // Get draw logic
   const { data: draw } = await serviceClient.from('draws').select('logic_type').eq('id', drawId).single()
   if (!draw) return { success: false, error: 'Draw not found.' }
 
-  // Generate simulation numbers
   const { data: numbers } = await serviceClient.rpc('generate_draw_numbers', { p_logic: draw.logic_type })
 
-  // Store simulation result (don't save to winning_numbers yet)
   await serviceClient.from('draws').update({
     simulation_runs: serviceClient.sql`simulation_runs + 1`,
     status: 'simulating',
@@ -103,15 +103,9 @@ export async function adminRunDrawSimulation(drawId: string) {
 }
 
 export async function adminPublishDraw(drawId: string, confirmedNumbers?: number[]) {
-  const user = await getAuthUser()
-  const supabase = await createClient()
-
-  const { data: profile } = await supabase.from('profiles').select('is_admin').eq('id', user.id).single()
-  if (!profile?.is_admin) return { success: false, error: 'Admin only.' }
-
+  const user = await requireAdmin()
   const serviceClient = await createServiceClient()
 
-  // Generate final numbers if not provided
   let winningNumbers = confirmedNumbers
   if (!winningNumbers) {
     const { data: draw } = await serviceClient.from('draws').select('logic_type').eq('id', drawId).single()
@@ -119,16 +113,13 @@ export async function adminPublishDraw(drawId: string, confirmedNumbers?: number
     winningNumbers = numbers
   }
 
-  // Set winning numbers
   await serviceClient.from('draws').update({
     winning_numbers: winningNumbers,
     draw_ran_at: new Date().toISOString(),
   }).eq('id', drawId)
 
-  // Process results
   const { data: results } = await serviceClient.rpc('process_draw_results', { p_draw_id: drawId })
 
-  // Handle jackpot rollover
   const next = await serviceClient.from('prize_pools')
     .select('id, rollover_amount_gbp')
     .eq('period_month', new Date().getMonth() + 2 > 12 ? 1 : new Date().getMonth() + 2)
@@ -136,9 +127,9 @@ export async function adminPublishDraw(drawId: string, confirmedNumbers?: number
     .single()
 
   type DrawResults = {
-  jackpot_rolled?: boolean
-  winners_by_match?: Record<string, unknown>
-}
+    jackpot_rolled?: boolean
+    winners_by_match?: Record<string, unknown>
+  }
 
   if ((results as DrawResults)?.jackpot_rolled && next.data) {
     const { data: currentPool } = await serviceClient.from('prize_pools').select('jackpot_pool_gbp').eq('id', (await serviceClient.from('draws').select('prize_pool_id').eq('id', drawId).single()).data?.prize_pool_id ?? '').single()
@@ -149,13 +140,12 @@ export async function adminPublishDraw(drawId: string, confirmedNumbers?: number
     }
   }
 
-  // Publish
   await serviceClient.from('draws').update({
     status: 'published',
     published_at: new Date().toISOString(),
   }).eq('id', drawId)
 
-  await supabase.from('audit_logs').insert({
+  await serviceClient.from('audit_logs').insert({
     user_id: user.id,
     action: 'draw_published',
     table_name: 'draws',
@@ -170,12 +160,9 @@ export async function adminPublishDraw(drawId: string, confirmedNumbers?: number
 }
 
 export async function adminUpdateDrawLogic(drawId: string, logic: 'random' | 'algorithmic') {
-  const user = await getAuthUser()
-  const supabase = await createClient()
-  const { data: profile } = await supabase.from('profiles').select('is_admin').eq('id', user.id).single()
-  if (!profile?.is_admin) return { success: false, error: 'Admin only.' }
-
-  await supabase.from('draws').update({ logic_type: logic }).eq('id', drawId)
+  await requireAdmin()
+  const serviceClient = await createServiceClient()
+  await serviceClient.from('draws').update({ logic_type: logic }).eq('id', drawId)
   revalidatePath('/admin/draws')
   return { success: true }
 }

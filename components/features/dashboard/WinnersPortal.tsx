@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
 import { createClient } from '@/lib/supabase/client'
+import { submitWinnerProof } from '@/app/actions/winners'
 
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
 
@@ -62,10 +63,12 @@ export function WinnersPortal({ winners: initial, userId }: { winners: WinnerRow
 
     const { data: { publicUrl } } = supabase.storage.from('winner-proofs').getPublicUrl(path)
 
-    await (supabase.from('winners') as any).update({
-      proof_url: publicUrl,
-      proof_uploaded_at: new Date().toISOString(),
-    }).eq('id', winnerId).eq('user_id', userId)
+    const result = await submitWinnerProof(winnerId, publicUrl)
+    if (!result.success) {
+      setUploadError(prev => ({ ...prev, [winnerId]: result.error ?? 'Failed to save proof.' }))
+    } else {
+      setWinners(prev => prev.map(w => w.id === winnerId ? { ...w, proof_url: publicUrl } : w))
+    }
 
     setUploading(null)
   }

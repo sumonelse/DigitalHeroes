@@ -3,7 +3,7 @@ import { useState, useTransition } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
 import type { Profile, Subscription } from '@/types'
 import { createCustomerPortalSession } from '@/app/actions/subscriptions'
-import { createClient } from '@/lib/supabase/client'
+import { updateProfile } from '@/app/actions/profile'
 
 interface Props {
   profile: Profile
@@ -34,14 +34,13 @@ export function SettingsPanel({ profile, subscription }: Props) {
   const handleProfileSave = async (e: React.FormEvent) => {
     e.preventDefault()
     setSaving(true)
-    const supabase = createClient()
-    await (supabase.from('profiles') as any).update({
+    const result = await updateProfile({
       full_name: name,
       phone,
       home_club: club,
       handicap: handicap ? parseFloat(handicap) : null,
-    }).eq('id', profile.id)
-    setSaved(true)
+    })
+    if (result.success) setSaved(true)
     setSaving(false)
     setTimeout(() => setSaved(false), 3000)
   }

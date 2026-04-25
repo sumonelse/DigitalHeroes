@@ -35,12 +35,12 @@ export async function POST(req: NextRequest) {
 
   try {
     await handleStripeWebhook(event);
-  } catch (err) {
-    console.error("[Stripe Webhook] Handler error:", err);
-    // Return 200 to prevent Stripe from retrying non-critical errors
+  } catch (err: any) {
+    console.error("[Stripe Webhook] Handler error:", err?.message || err);
+    // Return 500 so Stripe retries - we want to know if it fails
     return NextResponse.json(
-      { received: true, warning: "Handler encountered an error" },
-      { status: 200 },
+      { error: `Handler error: ${err?.message || err}` },
+      { status: 500 },
     );
   }
 
